@@ -1,12 +1,13 @@
 package hw7;
+
 public class User {
-	private String userId;
+	private int userId;
 	private String gender;
 	private int age;
 	private int occupation;
 	private String zipCode;
 
-	public User(String userId, String gender, int age, int occupation, String zipCode) {
+	public User(int userId, String gender, int age, int occupation, String zipCode) {
 		super();
 		this.userId = userId;
 		this.gender = gender;
@@ -15,7 +16,7 @@ public class User {
 		this.zipCode = zipCode;
 	}
 
-	public String getUserId() {
+	public int getUserId() {
 		return userId;
 	}
 

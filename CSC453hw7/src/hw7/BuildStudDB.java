@@ -5,15 +5,18 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 public class BuildStudDB {
 
 	public static void main(String[] args) {
-
 		String tableName = "student";
-
 		Connection conn = null;
 		Statement stmt = null;
+
+		List<Movie> movieList = MovieReader.getMovies("movies.dat", "::", "|");
+		List<Rating> ratingList = RatingReader.getRatings("ratings.dat", "::");
+		List<User> userList = UserReader.getUsers("users.dat", "::");
 
 		/***********************************************************************
 		 * determine if the JDBC driver exists and load it...
@@ -31,17 +34,11 @@ public class BuildStudDB {
 		 ***********************************************************************/
 		try {
 			System.out.print("Connecting to DEF database...\n\n");
-			// String url = dataSource + dbName;
-
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@140.192.30.237:1521:def", "mledezm1", "cdm1535695");
-
-			/*
-			 * conn = dbms.equals("localAccess") ? DriverManager.getConnection(url) : DriverManager.getConnection(url, userName, password );
-			 */
 			System.out.println("Connected to database DEF...");
 
 			/***********************************************************************
-			 * create an object by which we will pass SQL stmts to the database...
+			 * create an object by which we will pass SQL statements to the database...
 			 ***********************************************************************/
 			stmt = conn.createStatement();
 		} catch (SQLException se) {
