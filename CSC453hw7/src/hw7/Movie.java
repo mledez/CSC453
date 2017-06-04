@@ -23,4 +23,12 @@ public class Movie {
 	public String[] getGenres() {
 		return genres;
 	}
+
+	@Override
+	public String toString() {
+		String report = "";
+		for (String genre : genres)
+			report += genre + "; ";
+		return String.format("Movie ID: %d\nTitle: %s\nGenres: %s\n\n", movieId, title, report);
+	}
 }
