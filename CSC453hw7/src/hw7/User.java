@@ -3,11 +3,11 @@ package hw7;
 public class User {
 	private int userId;
 	private String gender;
-	private int age;
-	private int occupation;
+	private String age;
+	private String occupation;
 	private String zipCode;
 
-	public User(int userId, String gender, int age, int occupation, String zipCode) {
+	public User(int userId, String gender, String age, String occupation, String zipCode) {
 		super();
 		this.userId = userId;
 		this.gender = gender;
@@ -24,11 +24,11 @@ public class User {
 		return gender;
 	}
 
-	public int getAge() {
+	public String getAge() {
 		return age;
 	}
 
-	public int getOccupation() {
+	public String getOccupation() {
 		return occupation;
 	}
 
