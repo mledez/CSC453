@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BuildStudDB {
+public class MovieDatabase {
 	private Connection conn = null;
 	private Statement stmt = null;
 	private ResultSet rset = null;
@@ -36,31 +36,31 @@ public class BuildStudDB {
 	private static String userGenderTableName = "Gender";
 
 	public static void main(String[] args) {
-		BuildStudDB hw7 = new BuildStudDB();
+		MovieDatabase mdb = new MovieDatabase();
 		try {
-			hw7.connect("mledezm1", "cdm1535695");
+			mdb.connect("mledezm1", "cdm1535695");
 
-			hw7.processAge();
-			hw7.processOccupation();
-			hw7.processUserGender();
-			hw7.processGenre();
+			mdb.processAge();
+			mdb.processOccupation();
+			mdb.processUserGender();
+			mdb.processGenre();
 
-			hw7.processUser();
-			hw7.processMovie();
-			hw7.processMovieGenre();
-			hw7.processRating();
+			mdb.processUser();
+			mdb.processMovie();
+			mdb.processMovieGenre();
+			mdb.processRating();
 
-			hw7.printTop(5, ageTableName);
-			hw7.printTop(5, occupationTableName);
-			hw7.printTop(5, userGenderTableName);
-			hw7.printTop(5, genreTableName);
-			hw7.printTop(5, movieTableName);
-			hw7.printTop(5, movieGenreTableName);
-			hw7.printTop(5, ratingTableName);
+			mdb.printTop(5, ageTableName);
+			mdb.printTop(5, occupationTableName);
+			mdb.printTop(5, userGenderTableName);
+			mdb.printTop(5, genreTableName);
+			mdb.printTop(5, movieTableName);
+			mdb.printTop(5, movieGenreTableName);
+			mdb.printTop(5, ratingTableName);
 
-			hw7.printInterestingQuery();
+			mdb.printInterestingQuery();
 
-			hw7.closeAll();
+			mdb.closeAll();
 		} catch (SQLException e) {
 			System.out.println("SQL ERROR: " + e);
 		}
@@ -95,15 +95,10 @@ public class BuildStudDB {
 		for (String genre : ageMap.keySet()) {
 			pStmt.setString(1, genre);
 			pStmt.setString(2, ageMap.get(genre));
-			// pStmt.executeUpdate();
 			pStmt.addBatch();
 		}
 		pStmt.executeBatch();
 		System.out.println("A total of " + ageMap.size() + " rows were added\n");
-
-		// rset = stmt.executeQuery("SELECT * FROM " + tableName + " WHERE ROWNUM <= 10");
-		// while (rset.next())
-		// System.out.println(rset.getString("genre_id") + " : " + rset.getString("name"));
 	}
 
 	private void processUserGender() throws SQLException {
@@ -132,15 +127,10 @@ public class BuildStudDB {
 		for (String userGender : userGenderMap.keySet()) {
 			pStmt.setString(1, userGender);
 			pStmt.setString(2, userGenderMap.get(userGender));
-			// pStmt.executeUpdate();
 			pStmt.addBatch();
 		}
 		pStmt.executeBatch();
 		System.out.println("A total of " + userGenderMap.size() + " rows were added\n");
-
-		// rset = stmt.executeQuery("SELECT * FROM " + tableName + " WHERE ROWNUM <= 10");
-		// while (rset.next())
-		// System.out.println(rset.getString("genre_id") + " : " + rset.getString("name"));
 	}
 
 	private void processOccupation() throws SQLException {
@@ -185,15 +175,10 @@ public class BuildStudDB {
 		for (String occup_id : occupationMap.keySet()) {
 			pStmt.setString(1, occup_id);
 			pStmt.setString(2, occupationMap.get(occup_id));
-			// pStmt.executeUpdate();
 			pStmt.addBatch();
 		}
 		pStmt.executeBatch();
 		System.out.println("A total of " + occupationMap.size() + " rows were added\n");
-
-		// rset = stmt.executeQuery("SELECT * FROM " + tableName + " WHERE ROWNUM <= 10");
-		// while (rset.next())
-		// System.out.println(rset.getString("genre_id") + " : " + rset.getString("name"));
 	}
 
 	private void processGenre() throws SQLException {
@@ -236,7 +221,6 @@ public class BuildStudDB {
 			index = genreMap.get(genre);
 			pStmt.setInt(1, index);
 			pStmt.setString(2, genre);
-			// pStmt.executeUpdate();
 			pStmt.addBatch();
 
 			if (index % 500 == 0 && index != 1)
@@ -244,10 +228,6 @@ public class BuildStudDB {
 		}
 		pStmt.executeBatch();
 		System.out.println("A total of " + index + " rows were added\n");
-
-		// rset = stmt.executeQuery("SELECT * FROM " + tableName + " WHERE ROWNUM <= 10");
-		// while (rset.next())
-		// System.out.println(rset.getString("genre_id") + " : " + rset.getString("name"));
 	}
 
 	private void processUser() throws SQLException {
@@ -279,16 +259,12 @@ public class BuildStudDB {
 			pStmt.setString(4, user.getOccupation());
 			pStmt.setString(5, user.getZipCode());
 			pStmt.addBatch();
-			// pStmt.executeUpdate();
 			index = userList.indexOf(user) + 1;
 			if (index % 500 == 0 && index != 1)
 				System.out.print(String.format("%d rows added\r", index));
 		}
 		pStmt.executeBatch();
 		System.out.println("A total of " + index + " rows were added\n");
-		// rset = stmt.executeQuery("SELECT * FROM " + tableName + " WHERE ROWNUM <= 10");
-		// while (rset.next())
-		// System.out.println(rset.getString("user_id") + " : " + rset.getString("zip_code"));
 	}
 
 	private void processMovie() throws SQLException {
@@ -350,7 +326,6 @@ public class BuildStudDB {
 					pStmt.setInt(1, movie.getMovieId());
 					pStmt.setInt(2, genreMap.get(genre));
 					pStmt.addBatch();
-					// pStmt.executeUpdate();
 					index++;
 				} else
 					System.err.println("Genre not recognized: " + genre);
@@ -361,9 +336,6 @@ public class BuildStudDB {
 		}
 		pStmt.executeBatch();
 		System.out.println("A total of " + index + " rows were added\n");
-		// ResultSet rset = stmt.executeQuery("SELECT * FROM " + tableName + " WHERE ROWNUM <= 10");
-		// while (rset.next())
-		// System.out.println(rset.getString("movie_id") + " : " + rset.getString("genre_id"));
 	}
 
 	private void processRating() throws SQLException {
@@ -392,7 +364,6 @@ public class BuildStudDB {
 			pStmt.setInt(2, rating.getMovieId());
 			pStmt.setInt(3, rating.getRating());
 			pStmt.setTimestamp(4, new Timestamp(rating.getTimeStamp() * 1000));
-			// pStmt.executeUpdate();
 
 			pStmt.addBatch();
 
