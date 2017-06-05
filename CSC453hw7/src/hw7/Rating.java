@@ -4,9 +4,9 @@ public class Rating {
 	private int userId;
 	private int movieId;
 	private int rating;
-	private int timeStamp;
+	private long timeStamp;
 
-	public Rating(int userId, int movieId, int rating, int timeStamp) {
+	public Rating(int userId, int movieId, int rating, long timeStamp) {
 		super();
 		this.userId = userId;
 		this.movieId = movieId;
@@ -26,7 +26,7 @@ public class Rating {
 		return rating;
 	}
 
-	public int getTimeStamp() {
+	public long getTimeStamp() {
 		return timeStamp;
 	}
 }

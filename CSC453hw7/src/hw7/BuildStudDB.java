@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,7 +25,7 @@ public class BuildStudDB {
 	private List<Movie> movieList = MovieReader.getMovies("movies.dat", "::", "\\|");
 	private List<Rating> ratingList = RatingReader.getRatings("ratings.dat", "::");
 	private List<User> userList = UserReader.getUsers("users.dat", "::");
-	private int limitRatings = 10000;
+	private int limitRatings = 300000;
 	private static String userTableName = "movieUser";
 	private static String movieTableName = "movie";
 	private static String genreTableName = "genre";
@@ -32,7 +33,7 @@ public class BuildStudDB {
 	private static String ratingTableName = "rating";
 	private static String occupationTableName = "occupation";
 	private static String ageTableName = "age";
-	private static String userGenderTableName = "userGender";
+	private static String userGenderTableName = "Gender";
 
 	public static void main(String[] args) {
 		BuildStudDB hw7 = new BuildStudDB();
@@ -56,6 +57,8 @@ public class BuildStudDB {
 			hw7.printTop(5, movieTableName);
 			hw7.printTop(5, movieGenreTableName);
 			hw7.printTop(5, ratingTableName);
+
+			hw7.printInterestingQuery();
 
 			hw7.closeAll();
 		} catch (SQLException e) {
@@ -122,8 +125,8 @@ public class BuildStudDB {
 		stmt.executeUpdate(createString);
 
 		System.out.println("Inserting rows in " + userGenderTableName + " table...");
-		String insertString = String.format("INSERT INTO %s (userGender_id, userGender) VALUES (?, ?)",
-				userGenderTableName);
+		String insertString = String
+				.format("INSERT INTO %s (userGender_id, userGender) VALUES (?, ?)", userGenderTableName);
 		PreparedStatement pStmt = conn.prepareStatement(insertString);
 
 		for (String userGender : userGenderMap.keySet()) {
@@ -265,9 +268,8 @@ public class BuildStudDB {
 		stmt.executeUpdate(createString);
 
 		System.out.println("Inserting rows in " + userTableName + " table...");
-		String insertString = String.format(
-				"INSERT INTO %s (user_id, userGender_id, age_id, occupation_id, zip_code) VALUES (?, ?, ?, ?, ?)",
-				userTableName);
+		String insertString = String
+				.format("INSERT INTO %s (user_id, userGender_id, age_id, occupation_id, zip_code) VALUES (?, ?, ?, ?, ?)", userTableName);
 		PreparedStatement pStmt = conn.prepareStatement(insertString);
 		int index = 0;
 		for (User user : userList) {
@@ -299,30 +301,25 @@ public class BuildStudDB {
 
 		System.out.println("Building new '" + movieTableName + "' table...");
 		String createString = "CREATE TABLE " + movieTableName + " (movie_id NUMBER(4,0) NOT NULL PRIMARY KEY, "
-				+ "title VARCHAR2(150) NOT NULL)";
+				+ "title VARCHAR2(150) NOT NULL, year NUMBER(4,0) NOT NULL)";
 		stmt.executeUpdate(createString);
 
 		System.out.println("Inserting rows in " + movieTableName + " table...");
-		String insertString = String.format("INSERT INTO %s (movie_id, title) VALUES (?, ?)", movieTableName);
+		String insertString = String.format("INSERT INTO %s (movie_id, title, year) VALUES (?, ?, ?)", movieTableName);
 		pStmt = conn.prepareStatement(insertString);
 		int index = 0;
 		for (Movie movie : movieList) {
 			pStmt.setInt(1, movie.getMovieId());
 			pStmt.setString(2, movie.getTitle());
+			pStmt.setInt(3, movie.getYear());
 			pStmt.addBatch();
-			// pStmt.executeUpdate();
-			// if (movieList.indexOf(movie) >= 20)
-			// break;
+
 			index = movieList.indexOf(movie) + 1;
 			if (index % 500 == 0 && index != 1)
 				System.out.print(String.format("%d rows added\r", index));
 		}
 		pStmt.executeBatch();
 		System.out.println("A total of " + index + " rows were added\n");
-
-		// rset = stmt.executeQuery("SELECT * FROM " + tableName + " WHERE ROWNUM <= 10");
-		// while (rset.next())
-		// System.out.println(rset.getString("movie_id") + " : " + rset.getString("title"));
 	}
 
 	private void processMovieGenre() throws SQLException {
@@ -379,21 +376,22 @@ public class BuildStudDB {
 
 		System.out.println("Building new '" + ratingTableName + "' table...");
 		String createString = "CREATE TABLE " + ratingTableName + " (user_id NUMBER(4,0) NOT NULL, "
-				+ "movie_id NUMBER(4,0) NOT NULL, rating NUMBER(1,0) NOT NULL,"
+				+ "movie_id NUMBER(4,0) NOT NULL, rating NUMBER(1,0) NOT NULL, ratingTime TIMESTAMP(6) NOT NULL, "
 				+ "CONSTRAINT pk_ratings PRIMARY KEY (user_id, movie_id), "
 				+ "CONSTRAINT fk_user2 FOREIGN KEY (user_id) REFERENCES " + userTableName + "(user_id), "
 				+ "CONSTRAINT fk_movie2 FOREIGN KEY (movie_id) REFERENCES " + movieTableName + "(movie_id))";
 		stmt.executeUpdate(createString);
 
 		System.out.println("Inserting rows in " + ratingTableName + " table...");
-		String insertString = String.format("INSERT INTO %s (user_id, movie_id, rating) VALUES (?, ?, ?)",
-				ratingTableName);
+		String insertString = String
+				.format("INSERT INTO %s (user_id, movie_id, rating, ratingTime) VALUES (?, ?, ?, ?)", ratingTableName);
 		pStmt = conn.prepareStatement(insertString);
 		int index = 0;
 		for (Rating rating : ratingList) {
 			pStmt.setInt(1, rating.getUserId());
 			pStmt.setInt(2, rating.getMovieId());
 			pStmt.setInt(3, rating.getRating());
+			pStmt.setTimestamp(4, new Timestamp(rating.getTimeStamp() * 1000));
 			// pStmt.executeUpdate();
 
 			pStmt.addBatch();
@@ -410,10 +408,6 @@ public class BuildStudDB {
 		}
 		pStmt.executeBatch();
 		System.out.println("A total of " + index + " rows were added\n");
-		// rset = stmt.executeQuery("SELECT * FROM " + tableName + " WHERE ROWNUM <= 10");
-		// while (rset.next())
-		// System.out.println(
-		// rset.getString("user_id") + " : " + rset.getString("movie_id") + " : " + rset.getString("rating"));
 	}
 
 	private void connect(String userName, String password) {
@@ -452,16 +446,46 @@ public class BuildStudDB {
 		}
 
 		for (int i = 1; i <= columnCount; i++)
-			report += String.format("%-" + max.get(i) + "s\t", rsmd.getColumnName(i));
+			report += String.format("%-" + max.get(i) + "s   ", rsmd.getColumnName(i));
 
 		report += "\n";
 		rset.beforeFirst();
 		while (rset.next()) {
 			for (int j = 1; j <= columnCount; j++) {
-				report += String.format("%-" + max.get(j) + "s\t", rset.getString(j));
+				report += String.format("%-" + max.get(j) + "s   ", rset.getString(j));
 			}
 			report += "\n";
 		}
+		report = "Showing up to " + numRows + " results from table '" + tableName + "'\n" + report;
+		System.out.println(report);
+	}
+
+	private void printInterestingQuery() throws SQLException {
+		rset = stmt.executeQuery("SELECT title "
+				+ "FROM movieuser, gender, age, occupation, rating, moviegenre, genre, movie "
+				+ "WHERE movieuser.usergender_id = gender.usergender_id "
+				+ "AND gender.usergender = 'Male' "
+				+ "AND movieuser.occupation_id = occupation.occup_id "
+				+ "AND occupation.occup = 'programmer' "
+				+ "AND movieuser.age_id = age.age_id "
+				+ "AND age.RANGE = '50-55' "
+				+ "AND rating.user_id = movieuser.user_id "
+				+ "AND rating.rating = 5 "
+				+ "AND rating.movie_id = moviegenre.movie_id "
+				+ "AND moviegenre.genre_id = genre.genre_id "
+				+ "AND genre.NAME = 'Comedy' "
+				+ "AND movie.movie_id = rating.movie_id "
+				+ "AND movie.year >= 1990");
+
+		ResultSetMetaData rsmd = rset.getMetaData();
+		String report = rsmd.getColumnName(1) + "\n";
+		while (rset.next()) {
+			report += rset.getString("title") + "\n";
+		}
+		report = "This is an interesting Query...\n"
+				+ "Comedy movies from 1990 or more recent,\n"
+				+ "rated with 5 points by Male Programmers\n"
+				+ "that are between 50 and 55 years old\n\n" + report;
 		System.out.println(report);
 	}
 

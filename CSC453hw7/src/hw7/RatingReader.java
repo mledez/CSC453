@@ -19,7 +19,7 @@ public class RatingReader {
 			while ((line = br.readLine()) != null) {
 				String[] rating = line.split(separator);
 				ratingList.add(new Rating(Integer.parseInt(rating[0]), Integer.parseInt(rating[1]),
-						Integer.parseInt(rating[2]), Integer.parseInt(rating[3])));
+						Integer.parseInt(rating[2]), Long.parseLong(rating[3])));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
